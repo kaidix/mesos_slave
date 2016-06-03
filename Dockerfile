@@ -14,6 +14,14 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install oracle-java7-installer ora
 RUN apt-get -y install curl
 RUN curl -s http://d3kbcqa49mib13.cloudfront.net/spark-1.6.1-bin-hadoop2.6.tgz | tar -xz -C /usr/local/
 RUN cd /usr/local && ln -s spark-1.6.1-bin-hadoop2.6 spark
+
+RUN add-apt-repository -y ppa:fkrull/deadsnakes-python2.7
+RUN apt-get update
+RUN apt-get -y install python2.7 python-pandas
+RUN wget https://bootstrap.pypa.io/get-pip.py
+RUN python get-pip.py
+RUN pip install numpy pandas --upgrade
+
 ENV SPARK_HOME /usr/local/spark
 ENV MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/libmesos.so
 
@@ -27,5 +35,6 @@ ENV SPARK_WORKER_WEBUI_PORT 8081
 ENV JAVA_HOME=/usr/lib/jvm/java-7-oracle/
 
 EXPOSE 8080 7077 8888 8081 4040 7001 7002 7003 7004 7005 7006 
+ENV PYTHONPATH=$SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.9-src.zip:$SPARK_HOME/python/build:$PYTHONPATH
 
 ENTRYPOINT ["mesos-slave", "--launcher=posix"]
